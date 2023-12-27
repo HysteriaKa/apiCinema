@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
+use App\Controller\ApiController;
 use App\Repository\MovieRepository;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\Collection;
@@ -17,6 +18,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 		new Get(
             security: "is_granted('PUBLIC_ACCESS')",
             requirements: ['id' => '\d+'],
+			name: 'picture',
+            uriTemplate: '/movies/{id}',
+            controller: ApiController::class,
 			normalizationContext: ['groups' => ['getMovie']]
         ),
 	]
