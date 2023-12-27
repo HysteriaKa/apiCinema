@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\ApiProperty;
 		new Get( security: "is_granted('PUBLIC_ACCESS')"),
 		new GetCollection( security: "is_granted('PUBLIC_ACCESS')"),
 		new Patch(
-			denormalizationContext: ['groups' => ['writeMovie']],
+			denormalizationContext: ['groups' => ['writeHasPeople']],
 			securityPostDenormalize: "is_granted('ROLE_ADMIN')",
             securityPostDenormalizeMessage: 'Sorry, you are not allowed to do this action.'
 		),
@@ -28,7 +28,7 @@ use ApiPlatform\Metadata\ApiProperty;
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: 'Only admins can add movies.',
             status: 301,
-			denormalizationContext: ['groups' => ['writeMovie']],
+			denormalizationContext: ['groups' => ['writeHasPeople']],
         ),
 		new Delete(
 			security: "is_granted('ROLE_ADMIN')",
@@ -47,10 +47,11 @@ class MovieHasPeople
 
     #[ORM\ManyToOne(inversedBy: 'movieHasPeople')]
     #[ORM\JoinColumn(nullable: false)]
+	#[Groups(["getMovieHasPeople",'writeMovie','writeHasPeople'])]
     private ?Movie $movie = null;
 
     #[ORM\Column(type: 'string', enumType: SignificanceEnum::class, nullable: true)]
-	#[Groups(["getMovieHasPeople",'writeMovie'])]
+	#[Groups(["getMovieHasPeople",'writeMovie','writeHasPeople'])]
 	#[ApiProperty(
         openapiContext: [
             'type' => 'string',
@@ -61,12 +62,12 @@ class MovieHasPeople
     private ?SignificanceEnum $significance = null;
 
     #[ORM\Column(length: 255)]
-	#[Groups(["getMovieHasPeople","writeMovie"])]
+	#[Groups(["getMovieHasPeople",'writeMovie','writeHasPeople'])]
     private ?string $role = null;
 
     #[ORM\ManyToOne(inversedBy: 'movieHasPeople',cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
-	#[Groups(["writeMovie","getMovieHasPeople"])]
+	#[Groups(["getMovieHasPeople",'writeMovie','writeHasPeople'])]
     private ?People $people = null;
 
     public function getId(): ?int

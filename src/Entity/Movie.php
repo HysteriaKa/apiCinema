@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\ApiFilter;
 use App\Controller\ApiController;
 use App\Repository\MovieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -65,7 +66,7 @@ class Movie
     private ?int $duration = null;
 
     #[ORM\OneToMany(mappedBy: 'movie', targetEntity: MovieHasPeople::class, orphanRemoval: true,cascade: ['persist'])]
-    #[Groups(["writeMovie","getMovie"])]
+    #[Groups(["getMovie","getMovie"])]
 	private Collection $movieHasPeople;
 
     #[ORM\OneToMany(mappedBy: 'movie', targetEntity: MovieHasType::class,cascade: ['persist'])]

@@ -14,14 +14,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: MovieHasTypeRepository::class)]
 
 #[ApiResource(
-	normalizationContext: ['groups' => ['getPeople']],
+	normalizationContext: ['groups' => ['getType']],
 	operations: [
 		new Get(security: "is_granted('PUBLIC_ACCESS')"),
 		new GetCollection(
             security: "is_granted('PUBLIC_ACCESS')",
 		),
 		new Patch(
-			denormalizationContext: ['groups' => ['writeMovie']],
+			denormalizationContext: ['groups' => ['writeType']],
 			securityPostDenormalize: "is_granted('ROLE_ADMIN')",
             securityPostDenormalizeMessage: 'Sorry, you are not allowed to do this action.'
 		),
@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: 'Only admins can add movies.',
             status: 301,
-			denormalizationContext: ['groups' => ['writeMovie']],
+			denormalizationContext: ['groups' => ['writeType']],
         ),
 		new Delete(
 			security: "is_granted('ROLE_ADMIN')",
@@ -47,11 +47,11 @@ class MovieHasType
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'movieHasTypes')]
-	#[Groups(["getPeople","getMovie"])]
+	#[Groups(["getType",'writeType'])]
     private ?Movie $movie = null;
 
     #[ORM\ManyToOne(inversedBy: 'movieHasTypes')]
-	#[Groups(["writeMovie","getMovie"])]
+	#[Groups(['writeMovie','writeType',"getType"])]
     private ?Type $type = null;
 
     public function getId(): ?int

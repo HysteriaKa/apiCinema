@@ -55,6 +55,7 @@ class People
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+	#[Groups(["getPeople"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
