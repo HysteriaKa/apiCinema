@@ -2,18 +2,21 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\Get;
-use Doctrine\ORM\Mapping as ORM;
-use App\Repository\TypeRepository;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\TypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+
 
 #[ORM\Entity(repositoryClass: TypeRepository::class)]
 #[ApiResource(
-	order: ['name' => 'ASC'],
+    order: ['name' => 'ASC'],
     normalizationContext: ['groups' => ['getMovie']],
 	operations: [
         new GetCollection(
@@ -21,19 +24,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ) ,  
 		new Get()
     ]
-)]
+	
+	)]
+	#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'name' =>'partial'])]
+	
 class Type
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-	#[Groups("getMovie")]
+    #[Groups("getMovie")]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'type', targetEntity: MovieHasType::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'type', targetEntity: MovieHasType::class)]
 	#[Groups("getMovie")]
     private Collection $movieHasTypes;
 

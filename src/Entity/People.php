@@ -2,18 +2,20 @@
 
 namespace App\Entity;
 
-use Assert\NotBlank;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PeopleRepository;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PeopleRepository::class)]
@@ -46,38 +48,34 @@ use Symfony\Component\Serializer\Annotation\Groups;
 	
     ],
 )]
+#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact',  'lastname' => 'word_start'])]
+#[ApiFilter(PropertyFilter::class, arguments: ['parameterName' => 'lastname'])]
 class People
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-	#[NotBlank]
-	#[Groups(["getPeople"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-	#[NotBlank]
 	#[Groups(["getPeople","writePeople"])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
-	#[NotBlank]
 	#[Groups(["getPeople","writePeople"])]
     private ?string $lastname = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-	#[NotBlank]
 	#[Groups(["getPeople","writePeople"])]
     private ?\DateTimeInterface $dateOfBirth = null;
 
     #[ORM\Column(length: 255)]
-	#[NotBlank]
 	#[Groups(["getPeople","writePeople"])]
     private ?string $nationality = null;
 
-    #[ORM\OneToMany(mappedBy: 'people', targetEntity: MovieHasPeople::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'people', targetEntity: MovieHasPeople::class)]
 	#[Groups(["getPeople"])]
-    private Collection $movieHasPeople;
+	private Collection $movieHasPeople;
 
     public function __construct()
     {
