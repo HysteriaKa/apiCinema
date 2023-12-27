@@ -29,6 +29,9 @@ class Movie
     #[ORM\OneToMany(mappedBy: 'movie', targetEntity: MovieHasType::class, orphanRemoval: true)]
     private Collection $movieHasTypes;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $pictureUrl = null;
+
     public function __construct()
     {
         $this->movieHasPeople = new ArrayCollection();
@@ -120,6 +123,18 @@ class Movie
                 $movieHasType->setMovie(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPictureUrl(): ?string
+    {
+        return $this->pictureUrl;
+    }
+
+    public function setPictureUrl(?string $pictureUrl): static
+    {
+        $this->pictureUrl = $pictureUrl;
 
         return $this;
     }
