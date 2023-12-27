@@ -2,33 +2,77 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use App\Repository\PeopleRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Assert\NotBlank;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PeopleRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PeopleRepository::class)]
-#[ApiResource]
+#[ApiResource(
+	normalizationContext: ['groups' => ['getPeople']],
+	operations: [
+        new Get(
+            security: "is_granted('PUBLIC_ACCESS')",
+            requirements: ['id' => '\d+'],
+			normalizationContext: ['groups' => ['getPeople']]
+        ),
+        new GetCollection(
+            security: "is_granted('PUBLIC_ACCESS')",
+		),
+		new Patch(
+			denormalizationContext: ['groups' => ['writePeople']],
+			securityPostDenormalize: "is_granted('ROLE_ADMIN')",
+            securityPostDenormalizeMessage: 'Sorry, you are not allowed to do this action.'
+		),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: 'Only admins can add peoples.',
+            status: 301,
+			denormalizationContext: ['groups' => ['writePeople']],
+        ),
+		new Delete(
+			security: "is_granted('ROLE_ADMIN')",
+            securityMessage: 'Only admins can add peoples.'
+		)
+	
+    ],
+)]
 class People
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+	#[NotBlank]
+	#[Groups(["getPeople"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+	#[NotBlank]
+	#[Groups(["getPeople","writePeople"])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
+	#[NotBlank]
+	#[Groups(["getPeople","writePeople"])]
     private ?string $lastname = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+	#[NotBlank]
+	#[Groups(["getPeople","writePeople"])]
     private ?\DateTimeInterface $dateOfBirth = null;
 
     #[ORM\Column(length: 255)]
+	#[NotBlank]
+	#[Groups(["getPeople","writePeople"])]
     private ?string $nationality = null;
 
     #[ORM\OneToMany(mappedBy: 'people', targetEntity: MovieHasPeople::class, orphanRemoval: true)]
