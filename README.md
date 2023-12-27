@@ -28,4 +28,6 @@ pwd : pass_1234
  php bin/console lexik:jwt:generate-keypair
   ```
 
-  
+ ###Améliorations à envisager
+mieux fournir la documentation api
+Utilliser des DTO pour le traitement de l'appel IMDB 
