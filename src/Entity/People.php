@@ -76,6 +76,7 @@ class People
     private ?string $nationality = null;
 
     #[ORM\OneToMany(mappedBy: 'people', targetEntity: MovieHasPeople::class, orphanRemoval: true)]
+	#[Groups(["getPeople"])]
     private Collection $movieHasPeople;
 
     public function __construct()
