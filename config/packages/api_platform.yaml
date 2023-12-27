@@ -1,12 +1,17 @@
 api_platform:
-    title: API cinema
+    title: Cinema Api
     version: 1.0.0
     formats:
-        jsonld: ['application/ld+json']
+        json:  ['application/json']    
     docs_formats:
+        json:  ['application/json'] 
         jsonld: ['application/ld+json']
         jsonopenapi: ['application/vnd.openapi+json']
         html: ['text/html']
+    error_formats:
+        jsonproblem: ['application/problem+json']
+        jsonld: ['application/ld+json']      # Hydra error formats
+        jsonapi: ['application/vnd.api+json']
     defaults:
         stateless: true
         cache_headers:
@@ -14,5 +19,16 @@ api_platform:
         extra_properties:
             standard_put: true
             rfc_7807_compliant_errors: true
+        pagination_items_per_page: 10
     event_listeners_backward_compatibility_layer: false
     keep_legacy_inflector: false
+    swagger:
+         api_keys:
+             JWT:
+                name: Authorization
+                type: header
+    eager_loading:
+        fetch_partial: true
+        force_eager: false
+
+
