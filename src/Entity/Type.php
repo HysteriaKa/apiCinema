@@ -2,14 +2,26 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use App\Repository\TypeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\TypeRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TypeRepository::class)]
-#[ApiResource]
+#[ApiResource(
+	order: ['name' => 'ASC'],
+    normalizationContext: ['groups' => ['getMovie']],
+	operations: [
+        new GetCollection(
+            paginationEnabled: false
+        ) ,  
+		new Get()
+    ]
+)]
 class Type
 {
     #[ORM\Id]
@@ -18,9 +30,11 @@ class Type
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+	#[Groups("getMovie")]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'type', targetEntity: MovieHasType::class, orphanRemoval: true)]
+	#[Groups("getMovie")]
     private Collection $movieHasTypes;
 
     public function __construct()
