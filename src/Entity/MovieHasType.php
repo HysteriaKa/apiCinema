@@ -2,27 +2,43 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Post;
-use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\MovieHasTypeRepository;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-
 #[ORM\Entity(repositoryClass: MovieHasTypeRepository::class)]
+
 #[ApiResource(
-	normalizationContext: ['groups' => ['getHasType']],
-	operations:[
+	normalizationContext: ['groups' => ['getPeople']],
+	operations: [
 		new Get(security: "is_granted('PUBLIC_ACCESS')"),
+		new GetCollection(
+            security: "is_granted('PUBLIC_ACCESS')",
+		),
+		new Patch(
+			denormalizationContext: ['groups' => ['writeMovie']],
+			securityPostDenormalize: "is_granted('ROLE_ADMIN')",
+            securityPostDenormalizeMessage: 'Sorry, you are not allowed to do this action.'
+		),
 		new Post(
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: 'Only admins can add movies.',
             status: 301,
 			denormalizationContext: ['groups' => ['writeMovie']],
         ),
-		]
+		new Delete(
+			security: "is_granted('ROLE_ADMIN')",
+            securityMessage: 'Only admins can add movies.'
+		)
+		
+	]
 	
-)]
+	)]
 class MovieHasType
 {
     #[ORM\Id]
@@ -31,13 +47,11 @@ class MovieHasType
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'movieHasTypes')]
-    #[ORM\JoinColumn(nullable: false)]
-	#[Groups(["getHasType","writeMovie"])]
+	#[Groups(["getPeople","getMovie"])]
     private ?Movie $movie = null;
 
     #[ORM\ManyToOne(inversedBy: 'movieHasTypes')]
-    #[ORM\JoinColumn(nullable: false)]
-	#[Groups(["getHasType","writeMovie"])]
+	#[Groups(["writeMovie","getMovie"])]
     private ?Type $type = null;
 
     public function getId(): ?int

@@ -2,83 +2,78 @@
 
 namespace App\Entity;
 
-use Assert\NotBlank;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
-use Doctrine\ORM\Mapping as ORM;
 use App\Controller\ApiController;
 use App\Repository\MovieRepository;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GetCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MovieRepository::class)]
 #[ApiResource(
-	order: ['title' => 'ASC'],
-	operations: [
-		new Get(
+    order: ['title' => 'ASC'],
+    // normalizationContext: ['groups' => ['movie']],
+    operations: [
+        new Get(
             security: "is_granted('PUBLIC_ACCESS')",
             requirements: ['id' => '\d+'],
-			name: 'picture',
+            name: 'picture',
             uriTemplate: '/movies/{id}',
             controller: ApiController::class,
 			normalizationContext: ['groups' => ['getMovie']]
         ),
-		new GetCollection(
+        new GetCollection(
             security: "is_granted('PUBLIC_ACCESS')",
-			normalizationContext: ['groups' => ['getMovie']]
 		),
-		new Post(
-            security: "is_granted('ROLE_ADMIN')",
-            securityMessage: 'Only admins can add movies.',
-            status: 301,
-			denormalizationContext: ['groups' => ['writeMovie']],
-        ),
 		new Patch(
 			denormalizationContext: ['groups' => ['writeMovie']],
 			securityPostDenormalize: "is_granted('ROLE_ADMIN')",
             securityPostDenormalizeMessage: 'Sorry, you are not allowed to do this action.'
 		),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: 'Only admins can add movies.',
+            status: 301,
+			denormalizationContext: ['groups' => ['writeMovie']],
+        ),
 		new Delete(
 			security: "is_granted('ROLE_ADMIN')",
-            securityMessage: 'Only admins can delete movies.'
+            securityMessage: 'Only admins can add movies.'
 		)
-	]
+    ],
 )]
 class Movie
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-	#[Groups("getMovie")]
+    #[Groups("getMovie")]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-	#[Assert\NotBlank]
-	#[Groups(["writeMovie","getMovie"])]
+    #[Groups(["writeMovie","getMovie"])]
     private ?string $title = null;
 
     #[ORM\Column]
-	#[Groups(["writeMovie","getMovie"])]
-	#[Assert\NotBlank]
+    #[Groups(["writeMovie","getMovie"])]
     private ?int $duration = null;
 
-    #[ORM\OneToMany(mappedBy: 'movie', targetEntity: MovieHasPeople::class, orphanRemoval: true)]
-	#[Assert\NotBlank]
-	#[Groups(["writeMovie","getMovie"])]
-    private Collection $movieHasPeople;
+    #[ORM\OneToMany(mappedBy: 'movie', targetEntity: MovieHasPeople::class, orphanRemoval: true,cascade: ['persist'])]
+    #[Groups(["writeMovie","getMovie"])]
+	private Collection $movieHasPeople;
 
-    #[ORM\OneToMany(mappedBy: 'movie', targetEntity: MovieHasType::class, orphanRemoval: true)]
-	#[Assert\NotBlank]
+    #[ORM\OneToMany(mappedBy: 'movie', targetEntity: MovieHasType::class,cascade: ['persist'])]
 	#[Groups(["writeMovie","getMovie"])]
     private Collection $movieHasTypes;
 
     #[ORM\Column(length: 255, nullable: true)]
-	#[Groups("getMovie")]
+	#[Groups(["getMovie"])]
     private ?string $pictureUrl = null;
 
     public function __construct()
@@ -172,7 +167,6 @@ class Movie
                 $movieHasType->setMovie(null);
             }
         }
-
         return $this;
     }
 

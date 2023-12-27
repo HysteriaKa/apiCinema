@@ -14,7 +14,6 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\ApiProperty;
 
-#[ORM\Entity(repositoryClass: MovieHasPeopleRepository::class)]
 #[ApiResource(
 	normalizationContext: ['groups' => ['getMovieHasPeople']],
 	operations: [
@@ -36,7 +35,8 @@ use ApiPlatform\Metadata\ApiProperty;
             securityMessage: 'Only admins can add movies.'
 		)
 	]
-)]
+	)]
+#[ORM\Entity(repositoryClass: MovieHasPeopleRepository::class)]
 class MovieHasPeople
 {
     #[ORM\Id]
@@ -60,14 +60,14 @@ class MovieHasPeople
     )]
     private ?SignificanceEnum $significance = null;
 
-    #[ORM\ManyToOne(inversedBy: 'movieHasPeople')]
-    #[ORM\JoinColumn(nullable: false)]
-	#[Groups(["writeMovie","getMovieHasPeople"])]
-    private ?People $people = null;
-
     #[ORM\Column(length: 255)]
 	#[Groups(["getMovieHasPeople","writeMovie"])]
     private ?string $role = null;
+
+    #[ORM\ManyToOne(inversedBy: 'movieHasPeople',cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+	#[Groups(["writeMovie","getMovieHasPeople"])]
+    private ?People $people = null;
 
     public function getId(): ?int
     {
@@ -86,26 +86,14 @@ class MovieHasPeople
         return $this;
     }
 
-    public function getSignificance(): ?string
+    public function getSignificance(): ?SignificanceEnum
     {
         return $this->significance;
     }
 
-    public function setSignificance(?string $significance): static
+    public function setSignificance(?SignificanceEnum $significance): self
     {
         $this->significance = $significance;
-
-        return $this;
-    }
-
-    public function getPeople(): ?People
-    {
-        return $this->people;
-    }
-
-    public function setPeople(?People $people): static
-    {
-        $this->people = $people;
 
         return $this;
     }
@@ -118,6 +106,18 @@ class MovieHasPeople
     public function setRole(string $role): static
     {
         $this->role = $role;
+
+        return $this;
+    }
+
+    public function getPeople(): ?People
+    {
+        return $this->people;
+    }
+
+    public function setPeople(?People $people): static
+    {
+        $this->people = $people;
 
         return $this;
     }
