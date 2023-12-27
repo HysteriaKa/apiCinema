@@ -8,6 +8,7 @@ use App\Repository\MovieRepository;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MovieRepository::class)]
 #[ApiResource(
@@ -25,21 +26,27 @@ class Movie
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+	#[Groups("getMovie")]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+	#[Groups("getMovie")]
     private ?string $title = null;
 
     #[ORM\Column]
+	#[Groups("getMovie")]
     private ?int $duration = null;
 
     #[ORM\OneToMany(mappedBy: 'movie', targetEntity: MovieHasPeople::class, orphanRemoval: true)]
+	#[Groups("getMovie")]
     private Collection $movieHasPeople;
 
     #[ORM\OneToMany(mappedBy: 'movie', targetEntity: MovieHasType::class, orphanRemoval: true)]
+	#[Groups("getMovie")]
     private Collection $movieHasTypes;
 
     #[ORM\Column(length: 255, nullable: true)]
+	#[Groups("getMovie")]
     private ?string $pictureUrl = null;
 
     public function __construct()
