@@ -24,7 +24,7 @@ pwd : pass_1234
   ###JWT
   Générer des clés avec la commande
   
-    ```sh
+  ```sh
  php bin/console lexik:jwt:generate-keypair
   ```
 
