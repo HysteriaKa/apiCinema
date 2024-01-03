@@ -5,6 +5,7 @@ L'api étant payante après 500 appels par mois.
 La base de données étant déjà conséquente.
 La recherche de l'affiche se fait à l'appel d'un film si la photo n'est pas déjà en base.
 
+Ne pas oublier composer install et composer update
 ###Création base de données
 Dans Public/ressources vous trouverez les requêtes mises à jour avec une table User et l'ajout de pictureUrl dans Movie.
 
